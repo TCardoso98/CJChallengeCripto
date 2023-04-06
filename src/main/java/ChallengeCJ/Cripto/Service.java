@@ -7,7 +7,11 @@ import ChallengeCJ.Cripto.model.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+
+import java.time.format.DateTimeFormatter;
+
 import java.util.List;
 @org.springframework.stereotype.Service
 public class Service {
@@ -44,15 +48,44 @@ public class Service {
         return InstrumentMapper.getSingleton().parseResponse(instrumentsResponse);
     }
     private Weather weather;
-    private Date weatherInfoDay;
-    public Weather getWeather() {
-        if(weatherInfoDay == null || weatherInfoDay.getDay() < new Date().getDay()) {
+    private LocalDateTime weatherInfoDay;
+    private Weather getWeather() {
+        if(weatherInfoDay == null || weatherInfoDay.getDayOfMonth() < LocalDateTime.now().getDayOfMonth()) {
             String weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=38.68&longitude=-9.16&hourly=temperature_2m,relativehumidity_2m";
             WeatherResponse weatherResponse = restTemplate.getForObject(weatherUrl, WeatherResponse.class);
             if(weatherResponse == null) throw new NullPointerException();
-            weatherInfoDay = new Date();
+            weatherInfoDay = LocalDateTime.now();
             return weather = weatherResponse.hourly();
         }
         return weather;
+    }
+
+    public boolean getSuggestion(){
+        Weather weather = getWeather();
+        return suggestionAlgorithm(weather);
+    }
+
+    private boolean suggestionAlgorithm(Weather weather) {
+        int index = getArrayIndex(weather);
+        if(index < 0) throw new RuntimeException("Weather time does not have current hour");
+        double temperature = weather.temperature()[index];
+        int humidity = weather.humidity()[index];
+
+        double algorithmResult = temperature * temperature % humidity;
+        System.out.printf("Temperature: %f %n Humidity: %d %n Algo: %f",temperature,humidity,algorithmResult);
+        return temperature*2 % humidity > 10;
+    }
+
+    private int getArrayIndex(Weather weather) {
+        for (int i = 0; i < weather.time().length; i++) {
+            if(LocalDateTime.now().getHour() == getTimeHour(weather.time()[i])) return i;
+        }
+        return -1;
+    }
+
+    private int getTimeHour(String datetime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime dateTime = LocalDateTime.parse(datetime, formatter);
+       return dateTime.getHour();
     }
 }

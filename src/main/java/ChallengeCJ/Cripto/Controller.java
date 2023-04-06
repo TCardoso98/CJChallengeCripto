@@ -1,7 +1,7 @@
 package ChallengeCJ.Cripto;
 
 import ChallengeCJ.Cripto.model.Instrument;
-import jakarta.websocket.server.PathParam;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +15,7 @@ import java.util.Map;
 
 @RestController
 public class Controller {
+
     @GetMapping("/pairs/{instrumentName}")
     public ResponseEntity<?> getTradingPairInfo(@PathVariable String instrumentName, @RequestParam(value = "interval",defaultValue = "1M") String interval) {
         try {
@@ -23,6 +24,7 @@ public class Controller {
             combinedResponse.put("interval", interval);
             combinedResponse.put("ticker", Service.getSingleton().getTicker(instrumentName));
             combinedResponse.put("candleStick", Service.getSingleton().getCandleSticks(instrumentName,interval));
+            combinedResponse.put("Suggestion", Service.getSingleton().getSuggestion() ? "Buy" : "Sell");
             return ResponseEntity.ok(combinedResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
