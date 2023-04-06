@@ -1,4 +1,5 @@
 package ChallengeCJ.Cripto.mapper;
+import ChallengeCJ.Cripto.Constants;
 import ChallengeCJ.Cripto.model.CandleStick;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -20,12 +21,12 @@ public class CandleStickMapper  extends Mapper<List<CandleStick>>{
         List<CandleStick> candleStickList = new ArrayList<>();
         for (JsonNode candleStick: candleStickDataNode) {
             candleStickList.add(new CandleStick(
-                    candleStick.get("t").asInt(),
-                    candleStick.get("o").asDouble(),
-                    candleStick.get("h").asDouble(),
-                    candleStick.get("l").asDouble(),
-                    candleStick.get("c").asDouble(),
-                    candleStick.get("v").asDouble()
+                    candleStick.get(Constants.CandleStick.END_TIME.label).asInt(),
+                    candleStick.get(Constants.CandleStick.OPEN.label).asDouble(),
+                    candleStick.get(Constants.CandleStick.HIGH.label).asDouble(),
+                    candleStick.get(Constants.CandleStick.LOW.label).asDouble(),
+                    candleStick.get(Constants.CandleStick.CLOSE.label).asDouble(),
+                    candleStick.get(Constants.CandleStick.VOLUME.label).asDouble()
             ));
         }
         return candleStickList;
