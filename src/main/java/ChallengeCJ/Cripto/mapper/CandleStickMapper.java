@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CandleStickMapper  extends Mapper<List<CandleStick>>{
-
+    private CandleStickMapper(){}
+    private static CandleStickMapper singleton;
+    public static CandleStickMapper getSingleton() {
+        if(singleton != null) return singleton;
+        return singleton = new CandleStickMapper();
+    }
     @Override
     public List<CandleStick> parseResponse(String response) throws IOException {
         JsonNode rootNode = objectMapper.readTree(response);
@@ -25,5 +30,6 @@ public class CandleStickMapper  extends Mapper<List<CandleStick>>{
         }
         return candleStickList;
        }
+
 
 }

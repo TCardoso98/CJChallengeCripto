@@ -8,4 +8,5 @@ public abstract class Mapper<T> {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
     public abstract T parseResponse(String response) throws IOException;
+
 }
